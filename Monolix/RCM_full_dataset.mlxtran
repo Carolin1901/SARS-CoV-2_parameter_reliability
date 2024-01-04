@@ -1,0 +1,72 @@
+<DATAFILE>
+
+[FILEINFO]
+file='Data/selected_IDs_combined_mod.csv'
+delimiter = comma
+header = {ID, Time, Obs, Cens}
+
+[CONTENT]
+ID = {use=identifier}
+Time = {use=time}
+Obs = {use=observation, name=Obs, type=continuous}
+Cens = {use=censored}
+
+<MODEL>
+
+[INDIVIDUAL]
+input = {E0_pop, T0_pop, c_pop, delta_pop, omega_delta, logbeta_pop, omega_logbeta, p_pop, omega_p, tt0_pop, omega_tt0, logphi_pop, omega_logphi, logrho_pop, omega_logrho}
+
+DEFINITION:
+E0 = {distribution=logNormal, typical=E0_pop, no-variability}
+T0 = {distribution=logNormal, typical=T0_pop, no-variability}
+c = {distribution=logNormal, typical=c_pop, no-variability}
+delta = {distribution=logNormal, typical=delta_pop, sd=omega_delta}
+logbeta = {distribution=normal, typical=logbeta_pop, sd=omega_logbeta}
+p = {distribution=logNormal, typical=p_pop, sd=omega_p}
+tt0 = {distribution=logNormal, typical=tt0_pop, sd=omega_tt0}
+logphi = {distribution=normal, typical=logphi_pop, sd=omega_logphi}
+logrho = {distribution=normal, typical=logrho_pop, sd=omega_logrho}
+
+[LONGITUDINAL]
+input = {a}
+
+file = 'Models/IIR_negtinf.txt'
+
+DEFINITION:
+Obs = {distribution=normal, prediction=VL, errorModel=constant(a)}
+
+<FIT>
+data = Obs
+model = Obs
+
+<PARAMETER>
+E0_pop = {value=1, method=FIXED}
+T0_pop = {value=80000000, method=FIXED}
+a = {value=1, method=MLE}
+c_pop = {value=10, method=FIXED}
+delta_pop = {value=2.2, method=MLE}
+logbeta_pop = {value=6.4, method=MLE}
+logphi_pop = {value=6.7, method=MLE}
+logrho_pop = {value=1.3, method=MLE}
+omega_delta = {value=1, method=MLE}
+omega_logbeta = {value=1, method=MLE}
+omega_logphi = {value=1, method=MLE}
+omega_logrho = {value=1, method=MLE}
+omega_p = {value=1, method=MLE}
+omega_tt0 = {value=1, method=MLE}
+p_pop = {value=72.7, method=MLE}
+tt0_pop = {value=6, method=MLE}
+
+<MONOLIX>
+
+[TASKS]
+populationParameters()
+individualParameters(method = {conditionalMean, conditionalMode })
+fim(method = StochasticApproximation)
+logLikelihood(method = ImportanceSampling)
+plotResult(method = {indfits, parameterdistribution, covariancemodeldiagnosis, covariatemodeldiagnosis, obspred, vpc, residualsscatter, residualsdistribution, randomeffects, saemresults })
+
+[SETTINGS]
+GLOBAL:
+exportpath = 'IIR_fullDS'
+

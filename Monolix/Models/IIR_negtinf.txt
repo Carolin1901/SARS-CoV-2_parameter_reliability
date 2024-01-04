@@ -1,0 +1,28 @@
+
+[LONGITUDINAL]
+input = {T0, E0, tt0, logphi, logrho, delta, p, c, logbeta} 
+
+EQUATION:
+t0 = -tt0
+T_0 = T0
+R_0 = 0
+E_0 = E0
+I_0 = 0
+V_0 = 0
+
+k = 4		; fixed parameter
+
+beta = 10^-logbeta
+rho = 10^-logrho
+phi = 10^-logphi
+
+ddt_T = -beta*V*T - phi*T*I + rho*R
+ddt_R = phi*T*I - rho*R
+ddt_E = beta*V*T - k*E
+ddt_I = k*E-delta*I 
+ddt_V = p*I - c*V
+
+VL = log10(max(V, 0.001)) 
+
+OUTPUT:
+output = {VL}
